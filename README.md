@@ -30,7 +30,7 @@ Example response format:
 
 {"message": "Login successful"}
 
-# UML Sequence Diagram
+# UML Sequence Diagram (Look through edit view, formatting is weird if not)
 
 Client                    User Authentication Microservice
    |                                      |
