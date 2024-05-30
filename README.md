@@ -1,86 +1,84 @@
 # UserAuthMicroservice
 
+This User Authentication Microservice handles user authentication, signing in and signing up. The service users ZeroMQ for the communication.
+
 # Requesting Data:
-To request data from the User Authentication Microservice, follow these steps:
+To request data from the User Authentication Microservice, send a JSON object that contains the action sign_in or sign_up, the username and then the password to the ZeroMQ Server.
 
-1) Download the Microservice:
-Download the user_authentication_microservice.py file from the GitHub repository.
+**Example Request:**
 
-3) Import the Microservice:
-Import the UserAuthenticationMicroservice class into your Python program.
+Signing in
+```
+import zmq
 
-5) Initialize the Microservice:
-Create an instance of the UserAuthenticationMicroservice class.
+context = zmq.Context()
+socket = context.socket(zmq.REQ)
+socket.connect("tcp://localhost:5555")
 
+request = {
+    "action": "sign_in",
+    "username": "exampleUser",
+    "password": "examplePassword"
+}
+socket.send_json(request)
+response = socket.recv_json()
+print(response)
+```
+
+Singing Up
+```
+import zmq
+
+context = zmq.Context()
+socket = context.socket(zmq.REQ)
+socket.connect("tcp://localhost:5555")
+
+request = {
+    "action": "sign_up",
+    "username": "exampleUser",
+    "password": "ExamplePassword1!"
+}
+socket.send_json(request)
+response = socket.recv_json()
+print(response)
+```
 
 # Receiving Data: 
-Once you have downloaded and imported the microservice, you can use it locally in your Python program.
+The microservice will respond with a JSON object indicating the success of the request and a message.
 
-```Example Program:
-
-from user_authentication_microservice import UserAuthenticationMicroservice
-
-def sign_up(auth_microservice):
-    username = input("Enter your desired username: ")
-    password = input("Enter your desired password: ")
-    if auth_microservice.sign_up(username, password):
-        print("User registered successfully")
-    else:
-        print("Username already exists or password does not meet requirements")
-
-def sign_in(auth_microservice):
-    username = input("Enter your username: ")
-    password = input("Enter your password: ")
-    if auth_microservice.sign_in(username, password):
-        print("Login successful")
-    else:
-        print("Invalid username or password")
-
-def main():
-    # Initialize the microservice
-    auth_microservice = UserAuthenticationMicroservice()
-
-    while True:
-        print("\n1. Sign Up")
-        print("2. Sign In")
-        print("3. Exit")
-
-        choice = input("Enter your choice: ")
-
-        if choice == "1":
-            sign_up(auth_microservice)
-        elif choice == "2":
-            sign_in(auth_microservice)
-        elif choice == "3":
-            print("Exiting program...")
-            break
-        else:
-            print("Invalid choice. Please try again.")
-
-if __name__ == "__main__":
-    main()
+Sign in Receiving Data
 ```
+{
+    "success": True,
+    "message": "Successfully signed in!"
+}
+
+```
+Sign up Receiving Data
+```
+{
+    "success": True,
+    "message": "Successfully signed up!"
+}
+
+```
+**Running the Microservice**
+To run the microservice use this command:
+```python user_auth_service.py```
 
 # UML Sequence Diagram (Look through edit view, formatting is weird if not)
 
 Client                  User Authentication Microservice
-  |                                   |
-  |      sign_up(username, password) |
-  |---------------------------------->|
-  |                                   |
-  |          validate_password()     |
-  |---------------------------------->|
-  |                                   |
-  |         save_user_credentials()  |
-  |---------------------------------->|
-  |                                   |
-  |      [Registration Success]      |
-  |<----------------------------------|
-  |                                   |
-  |                                   |
-  |       sign_in(username, password)|
-  |---------------------------------->|
-  |                                   |
-  |      [Login Success/Failure]     |
-  |<----------------------------------|
-  |
+       |                                             |
+       |           (1) Send Request (JSON)           |
+       |-------------------------------------------->|
+       |                                             |
+       |                                             |
+       |        (2) Process Request (sign_in or      |
+       |                sign_up)                     |
+       |                                             |
+       |                                             |
+       |           (3) Send Response (JSON)          |
+       |<--------------------------------------------|
+       |                                             |
+       |                                             |
